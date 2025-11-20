@@ -1,0 +1,142 @@
+/* ===== HEADER GENERAL ===== */
+.header {
+    background: #1e1e2f;
+    color: white;
+    padding: 12px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Sección izquierda */
+.left-section {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #f5d04c;
+    text-decoration: none;
+}
+
+.logo:hover {
+    opacity: 0.8;
+}
+
+/* ===== NAV ===== */
+.nav {
+    display: flex;
+    gap: 25px;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #e0e0e0;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+/* Hover */
+.nav a:hover {
+    background: rgba(255,255,255,0.15);
+    color: white;
+}
+
+/* Activo */
+.nav a.active {
+    background: rgba(255,255,255,0.25);
+    color: white;
+}
+
+/* ===== SECCIÓN DERECHA ===== */
+.right-section {
+    display: flex;
+    align-items: center;
+}
+
+/* User initials */
+.user-initials {
+    width: 42px;
+    height: 42px;
+    background: #f5d04c;
+    color: #1e1e2f;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.user-initials:hover {
+    background: #e2be43;
+}
+
+/* ===== DROPDOWN ===== */
+.dropdown {
+    position: absolute;
+    margin-top: 5px;
+    right: 25px;
+    background: #fff;
+    color: #333;
+    width: 160px;
+    padding: 8px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    display: none;
+    animation: dropdownFade 0.2s ease;
+}
+
+.dropdown.show {
+    display: block;
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.dropdown a:hover {
+    background: #f5d04c;
+    color: #1e1e2f;
+}
+
+/* ===== ANIMACIÓN ===== */
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 720px) {
+    .nav {
+        display: none;
+    }
+
+    .left-section {
+        gap: 10px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+}
