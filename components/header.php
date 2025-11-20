@@ -4,9 +4,10 @@
         <link rel="stylesheet" href="../css/header.css">
 
         <nav class="nav">
-            <a href="movimientos.html">Movimientos</a>
-            <a href="gestion.html">Gestión de inventarios</a>
-            <a href="reportes.html">Reportes</a>
+            <a href="">Usuarios</a>
+            <a href="../views/movimientos.php">Movimientos</a>
+            <a href="../views/inventarios.php">Gestión de inventarios</a>
+            <a href="../views/reportes.php">Reportes</a>
         </nav>
     </div>
 

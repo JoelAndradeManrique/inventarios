@@ -24,7 +24,7 @@
 
             <button type="submit">Entrar</button>
 
-            <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
+            <a href="recuperar_password.php" class="forgot">¿Olvidaste tu contraseña?</a>
         </form>
     </div>
 
@@ -43,7 +43,7 @@
             togglePass.textContent = isPassword ? "🙈" : "👁️";
         });
 
-        // Toast
+        // Toast (Tu función original)
         function showToast(message, success = false) {
             toast.textContent = message;
             toast.className = "toast show " + (success ? "success" : "error");
@@ -53,17 +53,52 @@
             }, 2500);
         }
 
-        // Login demo
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
+        // --- LÓGICA DE LOGIN REAL ---
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault(); // Evita que se recargue la página
 
             const email = document.getElementById("email").value;
             const pass = passwordInput.value;
+            const submitBtn = form.querySelector('button');
 
-            if (email === "test@mail.com" && pass === "1234") {
-                showToast("Bienvenido", true);
-            } else {
-                showToast("Credenciales incorrectas", false);
+            // Deshabilitar botón para evitar doble clic
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Verificando...";
+
+            try {
+                // 1. Petición a tu API
+                const response = await fetch('../api/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email, password: pass })
+                });
+
+                // 2. Convertir respuesta a JSON
+                const data = await response.json();
+
+                if (data.success) {
+                    // CASO ÉXITO:
+                    showToast("¡Bienvenido! Redirigiendo...", true);
+                    
+                    // Esperamos 1 segundo para que vea el mensaje y redirigimos
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1000);
+
+                } else {
+                    // CASO ERROR (Contraseña mal, usuario no existe, etc):
+                    showToast(data.message, false);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Entrar";
+                }
+
+            } catch (error) {
+                console.error(error);
+                showToast("Error de conexión con el servidor", false);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Entrar";
             }
         });
     </script>

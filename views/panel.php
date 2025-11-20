@@ -4,54 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Inventarios</title>
-    <link rel="stylesheet" href="../css/panel.css">
+
+    <style>
+        body {
+            background: #f7f7f7;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* CONTENEDOR */
+        .container {
+            width: 95%;
+            margin: 25px auto;
+        }
+
+        h2 {
+            color: #444;
+        }
+
+        p {
+            color: #555;
+            font-size: 16px;
+        }
+
+        /* Caja bienvenida */
+        .welcome-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+        }
+    </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="left-section">
-            <a href="#" class="logo">Inventarios</a>
+<!-- == HEADER CARGADO AUTOMÁTICO == -->
+<div id="headerContainer"></div>
 
-            <nav class="nav">
-                <a href="#" class="active">Movimientos</a>
-                <a href="#">Gestión de inventarios</a>
-                <a href="#">Reportes</a>
-            </nav>
-        </div>
+<script>
+    // Cargar header.php
+    fetch("../components/header.php")
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById("headerContainer").innerHTML = html;
 
-        <div class="right-section">
-            <div class="user-menu">
-                <div id="userInitials" class="user-initials">JA</div>
+            // Activar dropdown
+            const userInitials = document.getElementById("userInitials");
+            const dropdown = document.getElementById("dropdown");
 
-                <div id="dropdown" class="dropdown">
-                    <a href="#">Editar usuario</a>
-                    <a href="#">Cerrar sesión</a>
-                </div>
-            </div>
-        </div>
-    </header>
+            userInitials.addEventListener("click", () => {
+                dropdown.classList.toggle("show");
+            });
 
+            window.addEventListener("click", (e) => {
+                if (!userInitials.contains(e.target)) {
+                    dropdown.classList.remove("show");
+                }
+            });
 
-    <main class="content">
+            // Marca la sección activa (Inicio / Panel)
+            const links = document.querySelectorAll(".nav a");
+            links.forEach(a => {
+                if (a.textContent.trim() === "Movimientos") {
+                    a.classList.remove("active");
+                }
+                if (a.textContent.trim() === "Inicio" || a.textContent.trim() === "Inventarios") {
+                    a.classList.add("active");
+                }
+            });
+        });
+</script>
+
+<!-- == CONTENIDO PRINCIPAL == -->
+<div class="container">
+    <div class="welcome-box">
         <h2>Bienvenido al Panel de Inventarios</h2>
-        <p>Aquí puedes gestionar tus módulos.</p>
-    </main>
-
-
-    <script>
-        const userInitials = document.getElementById("userInitials");
-        const dropdown = document.getElementById("dropdown");
-
-        userInitials.addEventListener("click", () => {
-            dropdown.classList.toggle("show");
-        });
-
-        window.addEventListener("click", (e) => {
-            if (!userInitials.contains(e.target)) {
-                dropdown.classList.remove("show");
-            }
-        });
-    </script>
+        <p>
+            Selecciona un módulo del menú superior para comenzar a trabajar.
+            Puedes gestionar movimientos, inventarios y generar reportes de ventas.
+        </p>
+    </div>
+</div>
 
 </body>
 </html>

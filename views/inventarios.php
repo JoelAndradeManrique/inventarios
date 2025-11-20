@@ -246,6 +246,9 @@
         <h2>Gestión de Inventarios</h2>
 
         <button class="btn" id="btnAdd">Añadir producto</button>
+        <input type="text" id="searchBar" placeholder="Buscar por nombre o código..." 
+       style="margin-top:15px; padding:10px; width:250px; border-radius:6px; border:1px solid #ccc;">
+
 
         <table id="tablaProductos">
 
@@ -372,8 +375,35 @@
             row.addEventListener("click", () => {
                 const expand = row.nextElementSibling;
                 expand.classList.toggle("visible");
+                
             });
+            
         });
+        const searchBar = document.getElementById("searchBar");
+const filasProductos = document.querySelectorAll("#tablaProductos tbody tr");
+
+searchBar.addEventListener("input", () => {
+    const texto = searchBar.value.toLowerCase();
+
+    filasProductos.forEach((fila, index) => {
+        // Solo hacemos match en las filas que son productos, no en las expand-row
+        if (fila.classList.contains("producto")) {
+            const nombre = fila.children[0].textContent.toLowerCase();
+            const categoria = fila.children[1].textContent.toLowerCase();
+            const codigo = fila.nextElementSibling.textContent.toLowerCase();
+
+            // Criterio de búsqueda
+            const coincide =
+                nombre.includes(texto) ||
+                categoria.includes(texto) ||
+                codigo.includes(texto);
+
+            // Mostrar u ocultar
+            fila.style.display = coincide ? "" : "none";
+            fila.nextElementSibling.style.display = coincide ? "" : "none";
+        }
+    });
+});
     </script>
 
 </body>
