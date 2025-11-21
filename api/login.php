@@ -33,7 +33,7 @@ try {
         // Respondemos éxito y la ruta a donde debe ir
         echo json_encode([
             'success' => true, 
-            'redirect' => '../views/panel.php' // O 'views/inventarios.php', tú decides la home
+            'redirect' => '../views/inicio_fase1.php' // O 'views/inventarios.php', tú decides la home
         ]);
     } else {
         // Login fallido
