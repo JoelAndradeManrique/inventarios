@@ -24,7 +24,7 @@
 
             <button type="submit">Entrar</button>
 
-            <a href="recuperar_password.php" class="forgot">¿Olvidaste tu contraseña?</a>
+            <a href="SolicitarRecuperacion.php" class="forgot">¿Olvidaste tu contraseña?</a>
         </form>
     </div>
 
