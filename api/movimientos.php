@@ -18,20 +18,20 @@ try {
         
         // === REGISTRAR MOVIMIENTO (COMPRA O VENTA) ===
         case 'POST':
-            // Esperamos: { tipo: 'SALIDA', productos: [ {id: 1, cantidad: 5}, ... ] }
-            
             if (empty($input['tipo']) || empty($input['productos'])) {
                 echo json_encode(['success'=>false, 'message'=>'Datos incompletos']); exit;
             }
 
-            $tipo = $input['tipo']; // 'ENTRADA' o 'SALIDA'
+            $tipo = $input['tipo']; 
             $listaProductos = $input['productos'];
-            $idUsuario = $_SESSION['user_id']; // 
-            
-            // Generamos un FOLIO único para este grupo de movimientos (El "Ticket")
+            $idUsuario = $_SESSION['user_id']; 
             $folio = strtoupper(uniqid('MOV-')); 
 
-            $pdo->beginTransaction(); // ¡CRÍTICO! Todo o nada.
+            $pdo->beginTransaction(); 
+            
+            // NUEVO: Dos listas separadas
+            $alertasBajas = []; // Para stock <= minimo (pero > 0)
+            $alertasCero = [];  // Para stock == 0
 
             try {
                 foreach ($listaProductos as $item) {
@@ -40,51 +40,59 @@ try {
 
                     if ($cantidad <= 0) continue;
 
-                    // 1. Obtenemos datos actuales del producto (Stock y Precios)
-                    $stmt = $pdo->prepare("SELECT stock_actual, nombre, precio_compra, precio_venta FROM productos WHERE id_producto = ?");
+                    // 1. Obtener datos
+                    $stmt = $pdo->prepare("SELECT stock_actual, stock_minimo, nombre, codigo_sku, precio_compra, precio_venta FROM productos WHERE id_producto = ?");
                     $stmt->execute([$idProd]);
                     $prodDB = $stmt->fetch();
 
-                    if (!$prodDB) {
-                        throw new Exception("El producto ID $idProd no existe.");
-                    }
+                    if (!$prodDB) { throw new Exception("Producto ID $idProd no encontrado."); }
 
-                    // 2. VALIDACIÓN DE STOCK 
+                    // 2. VALIDACIÓN Y CÁLCULO
                     if ($tipo === 'SALIDA') {
                         if ($prodDB['stock_actual'] < $cantidad) {
                             throw new Exception("Stock insuficiente para '{$prodDB['nombre']}'. Disponibles: {$prodDB['stock_actual']}");
                         }
                         $nuevoStock = $prodDB['stock_actual'] - $cantidad;
+
+                        // === LÓGICA DE DOBLE AVISO ===
+                        if ($nuevoStock == 0) {
+                            // CASO CRÍTICO: Se acabó
+                            $alertasCero[] = $prodDB['nombre']; // Guardamos el nombre para el mensaje
+                        } elseif ($nuevoStock <= $prodDB['stock_minimo']) {
+                            // CASO ADVERTENCIA: Bajó del mínimo
+                            $alertasBajas[] = $prodDB['nombre'];
+                        }
+
                     } else {
-                        // ENTRADA (Sumar stock) 
                         $nuevoStock = $prodDB['stock_actual'] + $cantidad;
                     }
 
-                    // 3. ACTUALIZAR STOCK EN PRODUCTOS
+                    // 3. ACTUALIZAR STOCK
                     $updateStmt = $pdo->prepare("UPDATE productos SET stock_actual = ? WHERE id_producto = ?");
                     $updateStmt->execute([$nuevoStock, $idProd]);
 
-                    // 4. REGISTRAR EL MOVIMIENTO EN EL HISTORIAL 
-                    // Guardamos precio_compra y precio_venta HISTÓRICOS para calcular ganancias exactas después
+                    // 4. HISTORIAL
                     $sqlMov = "INSERT INTO movimientos (tipo_movimiento, id_producto, id_usuario, cantidad, precio_compra_momento, precio_venta_momento, folio_transaccion) 
                                VALUES (?, ?, ?, ?, ?, ?, ?)";
                     $stmtMov = $pdo->prepare($sqlMov);
                     $stmtMov->execute([
-                        $tipo,
-                        $idProd,
-                        $idUsuario,
-                        $cantidad,
-                        $prodDB['precio_compra'], // Precio congelado al momento
-                        $prodDB['precio_venta'],  // Precio congelado al momento
-                        $folio
+                        $tipo, $idProd, $idUsuario, $cantidad,
+                        $prodDB['precio_compra'], $prodDB['precio_venta'], $folio
                     ]);
                 }
 
                 $pdo->commit();
-                echo json_encode(['success'=>true, 'message'=>"Movimiento registrado con éxito. Folio: $folio"]);
+                
+                // Enviamos las dos listas en la respuesta
+                echo json_encode([
+                    'success'=>true, 
+                    'message'=>"Movimiento registrado. Folio: $folio",
+                    'alertas_bajas' => $alertasBajas,
+                    'alertas_cero' => $alertasCero
+                ]);
 
             } catch (Exception $e) {
-                $pdo->rollBack(); // Si falla algo (ej: falta stock en el 3er producto), deshacemos TODO.
+                $pdo->rollBack(); 
                 echo json_encode(['success'=>false, 'message'=>$e->getMessage()]);
             }
             break;

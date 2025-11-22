@@ -89,7 +89,9 @@ require_once '../components/header.php';
     <div class="container">
         <h2>Gestión de Inventarios</h2>
 
-        <button class="btn" id="btnAdd">Añadir producto</button>
+        <button class="btn" id="btnAdd">
+            <i class="fa-solid fa-circle-plus"></i> Añadir producto
+        </button>
         <input type="text" id="searchBar" placeholder="Buscar por nombre o SKU..." 
                style="margin-top:15px; padding:10px; width:300px; border-radius:6px; border:1px solid #ccc;">
 
@@ -132,23 +134,23 @@ require_once '../components/header.php';
                     </div>
                     <div>
                         <label>Stock Mínimo</label>
-                        <input type="number" name="stock_minimo" id="stockMin" required value="5">
+                        <input type="number" name="stock_minimo" id="stockMin" required value="5" min="0">
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div>
                         <label>Precio Compra</label>
-                        <input type="number" name="precio_compra" id="precioCompra" required step="0.50">
+                        <input type="number" name="precio_compra" id="precioCompra" required step="0.50" min="0">
                     </div>
                     <div>
                         <label>Precio Venta</label>
-                        <input type="number" name="precio_venta" id="precioVenta" required step="0.50">
+                        <input type="number" name="precio_venta" id="precioVenta" required step="0.50" min="0">
                     </div>
                 </div>
 
                 <label>Stock Inicial</label>
-                <input type="number" name="stock_actual" id="stockActual" required value="0">
+                <input type="number" name="stock_actual" id="stockActual" required value="0" min="0">
 
                 <div class="total-box">
                     Valor invertido: $<span id="totalInversion">0.00</span>
@@ -156,7 +158,9 @@ require_once '../components/header.php';
 
                 <div class="modal-buttons">
                     <button type="button" class="btn btn-cancel" id="cancelar">Cancelar</button>
-                    <button type="submit" class="btn">Guardar Producto</button>
+                    <button type="submit" class="btn" id="btnGuardar">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Producto
+                    </button>
                 </div>
             </form>
         </div>
@@ -209,8 +213,7 @@ require_once '../components/header.php';
                     <td>${prod.contenido_neto}</td>
                     <td>$${prod.precio_venta}</td>
                     <td>${prod.stock_actual}</td>
-                    <td>${prod.alerta ? '⚠️' : '✅'}</td>
-                `;
+                    <td>${prod.alerta ? '<i class="fa-solid fa-triangle-exclamation" style="color:#e74c3c;"></i> Bajo' : '<i class="fa-solid fa-circle-check" style="color:#2ecc71;"></i> OK'}</td>                `;
 
                 // Lógica de Imagen: Si tiene imagen en BD, usamos esa ruta. Si no, null.
                 const imgUrl = prod.imagen ? `../uploads/${prod.imagen}` : null;
@@ -230,7 +233,9 @@ require_once '../components/header.php';
                                 Stock Mínimo: ${prod.stock_minimo}
                                 <br><br>
                                 <?php if ($rol === 'ADMIN'): ?>
-                                <button class="btn btn-danger" onclick="eliminarProducto(${prod.id_producto})">Eliminar</button>
+                                <button class="btn btn-danger" onclick="eliminarProducto(${prod.id_producto})">
+                                    <i class="fa-solid fa-trash"></i> Eliminar Producto
+                                </button>
                                 <?php endif; ?>
                             </div>
                             
@@ -286,6 +291,16 @@ require_once '../components/header.php';
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const pCompra = parseFloat(document.getElementById('precioCompra').value);
+            const pVenta = parseFloat(document.getElementById('precioVenta').value);
+
+            // ============================================================
+            // NUEVA VALIDACIÓN: PRECIO VENTA vs COMPRA
+            // ============================================================
+            if (pVenta < pCompra) {
+                showToast("Error: El precio de venta no puede ser menor al costo de compra.", "error");
+                return; // ¡ALTO! No enviamos nada al servidor.
+            }
             // Usamos FormData para empaquetar Textos + Archivo automáticamente
             const formData = new FormData(form);
 

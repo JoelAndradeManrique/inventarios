@@ -1,15 +1,20 @@
+/* IMPORTANTE: Asegura que la fuente cargue si no se cargó en el HTML */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
 /* ===== HEADER GENERAL ===== */
 .header {
     background: #1e1e2f;
     color: white;
-    padding: 12px 25px;
+    padding: 0 25px; /* Ajustado para centrar verticalmente mejor */
+    height: 65px;    /* Altura fija para consistencia */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Sombra más suave */
     position: sticky;
     top: 0;
     z-index: 1000;
+    font-family: 'Poppins', sans-serif; /* Aplicamos la fuente aquí */
 }
 
 /* Sección izquierda */
@@ -21,122 +26,139 @@
 
 .logo {
     font-size: 22px;
-    font-weight: bold;
+    font-weight: 600; /* Un poco más grueso */
     color: #f5d04c;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre icono y texto del logo */
 }
 
-.logo:hover {
-    opacity: 0.8;
-}
+.logo:hover { opacity: 0.9; }
 
 /* ===== NAV ===== */
-.nav {
-    display: flex;
-    gap: 25px;
-}
+.nav { display: flex; gap: 15px; }
 
 .nav a {
     text-decoration: none;
     color: #e0e0e0;
     font-weight: 500;
-    padding: 8px 12px;
+    padding: 8px 15px;
     border-radius: 6px;
-    transition: 0.2s;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    display: flex;
+    align-items: center; /* Centrar icono verticalmente */
 }
+
+/* Espacio para los iconos del menú */
+.nav a i { margin-right: 8px; }
 
 /* Hover */
 .nav a:hover {
-    background: rgba(255,255,255,0.15);
-    color: white;
+    background: rgba(255,255,255,0.1);
+    color: #f5d04c; /* Texto amarillo al pasar mouse */
+    transform: translateY(-2px); /* Efecto elevación sutil */
 }
 
 /* Activo */
 .nav a.active {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.15);
     color: white;
+    font-weight: 600;
 }
 
 /* ===== SECCIÓN DERECHA ===== */
-.right-section {
-    display: flex;
-    align-items: center;
+.right-section { display: flex; align-items: center; }
+
+/* Contenedor del Avatar (IMPORTANTE: relative para anclar el dropdown) */
+.user-menu {
+    position: relative; 
+    cursor: pointer;
+    padding: 5px;
 }
 
 /* User initials */
 .user-initials {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     background: #f5d04c;
     color: #1e1e2f;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
     transition: 0.2s;
+    border: 2px solid transparent;
 }
 
-.user-initials:hover {
-    background: #e2be43;
+.user-menu:hover .user-initials {
+    border-color: rgba(255,255,255,0.5);
+    transform: scale(1.05);
 }
 
 /* ===== DROPDOWN ===== */
 .dropdown {
     position: absolute;
-    margin-top: 5px;
-    right: 25px;
+    top: 55px;  /* Ajustado para caer justo debajo */
+    right: 0;   /* Alineado a la derecha del contenedor user-menu */
     background: #fff;
     color: #333;
-    width: 160px;
-    padding: 8px 0;
+    width: 200px; /* Un poco más ancho para el nombre completo */
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     display: none;
+    flex-direction: column;
+    overflow: hidden; /* Para que el borde redondeado funcione */
+    border: 1px solid #eee;
     animation: dropdownFade 0.2s ease;
 }
 
-.dropdown.show {
+.dropdown.show { display: flex; }
+
+/* Sección de "Hola, Joel" */
+.user-info-text {
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+}
+
+.user-info-text strong {
     display: block;
+    color: #333;
+    font-size: 14px;
+    margin-top: 3px;
 }
 
 .dropdown a {
-    display: block;
-    padding: 10px 15px;
-    color: #333;
+    padding: 12px 20px;
+    color: #444;
     text-decoration: none;
+    font-size: 14px;
     transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .dropdown a:hover {
-    background: #f5d04c;
+    background: #f5f5f5;
     color: #1e1e2f;
 }
 
 /* ===== ANIMACIÓN ===== */
 @keyframes dropdownFade {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ===== RESPONSIVO ===== */
-@media (max-width: 720px) {
-    .nav {
-        display: none;
-    }
-
-    .left-section {
-        gap: 10px;
-    }
-
-    .logo {
-        font-size: 20px;
-    }
+@media (max-width: 768px) {
+    .nav { display: none; } /* En móvil ocultamos menú (futuro: menú hamburguesa) */
+    .logo span { display: none; } /* Opcional: ocultar texto logo en muy pequeño */
 }

@@ -49,12 +49,26 @@ require_once '../components/header.php';
         .toast.show { visibility: visible; opacity: 1; top: 50px; }
         .toast.success { background-color: #4caf50; }
         .toast.error { background-color: #e63946; }
+        .toast.warning { 
+            background-color: #ff9800; 
+            color: white; 
+            width: 350px; 
+        }
+        
+        /* Toast Rojo Oscuro/Negro (Crítico - Stock 0) */
+        .toast.critical {
+            background-color: #c0392b; /* Rojo fuerte */
+            color: white;
+            width: 350px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(192, 57, 43, 0.5); /* Resplandor rojo */
+        }
     </style>
 </head>
 <body>
 
     <div id="toast" class="toast">Mensaje</div>
-
+    <div id="toastStock" class="toast">Alerta de Stock</div>
     <div class="container">
         <h2>Historial de Movimientos</h2>
 
@@ -331,6 +345,26 @@ require_once '../components/header.php';
                     showToast(result.message, 'success');
                     modalBg.style.display = 'none';
                     cargarHistorial();
+                    
+                    // --- LÓGICA DE AVISOS DOBLES ---
+                    
+                    // 1. AVISO CRÍTICO (Stock 0)
+                    if (result.alertas_cero && result.alertas_cero.length > 0) {
+                        const prods = result.alertas_cero.join(", ");
+                        // Usamos setTimeout para que si salen los dos, no se encimen instantáneamente
+                        setTimeout(() => {
+                            showCustomToast(`Ups, nos quedamos sin: ${prods}. Debemos pedir más.`, 'critical');
+                        }, 500); 
+                    }
+
+                    // 2. AVISO ADVERTENCIA (Bajo Stock)
+                    if (result.alertas_bajas && result.alertas_bajas.length > 0) {
+                        const prods = result.alertas_bajas.join(", ");
+                        setTimeout(() => {
+                            showCustomToast(`El stock mínimo de: ${prods} bajó. Revisa inventario.`, 'warning');
+                        }, 2500); // Sale 2 segundos después del primero para que le de tiempo de leer
+                    }
+
                 } else {
                     showToast(result.message, 'error');
                 }
@@ -353,6 +387,28 @@ require_once '../components/header.php';
                 }
             } catch(e) { alert("Error de conexión"); }
         });
+
+        let stockToastTimer;
+
+        function showCustomToast(message, type) {
+            const toastStock = document.getElementById("toastStock");
+            
+            // 1. Si ya había un contador corriendo, lo cancelamos para que no cierre el nuevo mensaje
+            if (stockToastTimer) {
+                clearTimeout(stockToastTimer);
+            }
+
+            // 2. Ponemos el contenido y mostramos
+            toastStock.textContent = message;
+            toastStock.className = "toast show " + type;
+            toastStock.style.top = "120px"; // Posición abajo del verde
+            
+            // 3. Iniciamos nuevo contador de 8 segundos
+            stockToastTimer = setTimeout(() => { 
+                toastStock.className = "toast"; // Ocultar
+                toastStock.style.top = "30px";  
+            }, 8000); 
+        }
 
     </script>
 </body>

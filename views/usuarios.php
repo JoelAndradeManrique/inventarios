@@ -108,14 +108,18 @@ if ($rol !== 'ADMIN') {
                 <label>Contraseña</label>
                 <div class="password-wrapper">
                     <input type="password" id="pass" placeholder="Mínimo 8 caracteres">
-                    <span class="eye-icon" onclick="togglePassword('pass', this)">👁️</span>
+                    <span class="eye-icon" onclick="togglePassword('pass', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </span>
                 </div>
                 <small style="color:#888; display:none;" id="passNote">Dejar vacío para mantener la actual</small>
 
                 <label id="lblPass2">Confirmar contraseña</label>
                 <div class="password-wrapper">
                     <input type="password" id="pass2">
-                    <span class="eye-icon" onclick="togglePassword('pass2', this)">👁️</span>
+                    <span class="eye-icon" onclick="togglePassword('pass', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </span>
                 </div>
 
                 <button type="submit" id="btnGuardar" class="save-btn">Guardar Usuario</button>
@@ -147,14 +151,20 @@ if ($rol !== 'ADMIN') {
         }
 
         // 2. TOGGLE PASSWORD
-        function togglePassword(inputId, icon) {
+        function togglePassword(inputId, spanElement) {
             const input = document.getElementById(inputId);
+            const icon = spanElement.querySelector('i'); // Buscamos el icono dentro del span
+
             if (input.type === "password") {
                 input.type = "text";
-                icon.textContent = "🙈";
+                // Cambiamos la clase del icono a "ojo tachado"
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
             } else {
                 input.type = "password";
-                icon.textContent = "👁️";
+                // Regresamos al "ojo normal"
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
 
@@ -180,8 +190,12 @@ if ($rol !== 'ADMIN') {
                         </td>
                         <td>${user.creado_en.substring(0,10)}</td>
                         <td class="actions">
-                            <button class="edit-btn" onclick='editarUsuario(${JSON.stringify(user)})'>Editar</button>
-                            <button class="delete-btn" onclick="preguntarEliminar(${user.id_usuario})">Eliminar</button>
+                            <button class="edit-btn" onclick='editarUsuario(${JSON.stringify(user)})' title="Editar">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="delete-btn" onclick="preguntarEliminar(${user.id_usuario})" title="Eliminar">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </td>
                     `;
                     tbody.appendChild(tr);

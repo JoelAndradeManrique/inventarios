@@ -136,8 +136,8 @@ if ($rol !== 'ADMIN') {
             <div class="filter-group">
                 <label>Tipo de Reporte</label>
                 <select id="tipoReporte">
-                    <option value="CORTES">💰 Cortes de Caja</option>
-                    <option value="MOVIMIENTOS">📦 Kardex (Entradas/Salidas)</option>
+                    <option value="CORTES">Cortes de Caja (Dinero)</option>
+                    <option value="MOVIMIENTOS">Kardex (Inventario)</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -156,8 +156,14 @@ if ($rol !== 'ADMIN') {
                 <label>Hasta</label>
                 <input type="date" id="fechaFin">
             </div>
-            <button class="btn-search" onclick="generarReporte()">Buscar</button>
-            <button class="btn-download" onclick="imprimirReporte()">🖨️ Imprimir PDF</button>
+            
+            <button class="btn-search" onclick="generarReporte()">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+            
+            <button class="btn-download" onclick="imprimirReporte()">
+                <i class="fa-solid fa-file-pdf"></i> Imprimir PDF
+            </button>
         </div>
 
         <table id="tablaReportes">
@@ -244,7 +250,9 @@ if ($rol !== 'ADMIN') {
                         // 1. Fila Principal
                         const trMain = document.createElement('tr');
                         trMain.innerHTML = `
-                            <td class="toggle-icon" onclick="toggleDetalle(this)">➕</td>
+                            <td class="toggle-icon" onclick="toggleDetalle(this)">
+                                <i class="fa-solid fa-circle-plus" style="font-size:18px;"></i>
+                            </td>
                             <td>${d.fecha_corte}</td>
                             <td>${d.usuario}</td>
                             <td><strong>$${d.ventas_totales}</strong></td>
@@ -305,10 +313,21 @@ if ($rol !== 'ADMIN') {
             } catch (error) { console.error(error); }
         }
 
-        window.toggleDetalle = function(icon) {
-            const filaDetalle = icon.parentElement.nextElementSibling;
+        window.toggleDetalle = function(td) {
+            const filaDetalle = td.parentElement.nextElementSibling;
             filaDetalle.classList.toggle('visible');
-            icon.textContent = filaDetalle.classList.contains('visible') ? '➖' : '➕';
+            
+            // Cambiar icono (Plus <-> Minus)
+            const icon = td.querySelector('i');
+            if (filaDetalle.classList.contains('visible')) {
+                icon.classList.remove('fa-circle-plus');
+                icon.classList.add('fa-circle-minus');
+                td.style.color = '#e74c3c'; // Opcional: Cambiar a rojo al abrir
+            } else {
+                icon.classList.remove('fa-circle-minus');
+                icon.classList.add('fa-circle-plus');
+                td.style.color = '#3498db'; // Regresar a azul
+            }
         };
     </script>
 
