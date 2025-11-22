@@ -101,7 +101,7 @@ if ($rol !== 'ADMIN') {
             
             /* >>> AQUÍ QUITAMOS EL EMOJI <<< */
             .toggle-icon { display: none !important; } /* Oculta la celda del + */
-            th:first-child { display: none !important; } /* Oculta el encabezado vacío de esa columna */
+            .no-print { display: none !important; }
             
             /* Estilos de la lista vertical */
             .product-list { 
@@ -239,8 +239,7 @@ if ($rol !== 'ADMIN') {
                 if (tipo === 'CORTES') {
                     thead.innerHTML = `
                         <tr>
-                            <th></th>
-                            <th>Fecha Corte</th>
+                            <th class="no-print"></th> <th>Fecha Corte</th>
                             <th>Cajero</th>
                             <th>Ventas</th>
                             <th>Ganancia</th>
